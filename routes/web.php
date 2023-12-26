@@ -52,7 +52,13 @@ Route::get('/create', [ProdukController::class, 'create'])->name('backpage.creat
 // Route::post('/addtocart/{id}', [ProdukController::class, 'addToCartApi']);
 // web.php atau routes.php
 Route::post('/api/addtocart/{id}', 'API\ProdukController@addToCartAPI');
+Route::get('/api/getCartCount', 'API\ProdukController@getCartCount');
+Route::get('api/cart', 'API\ProdukController@showCart');
+Route::delete('/api/removefromcart/{productId}', 'API\ProdukController@removeFromCartApi');
+
+
 Route::get('/some-page', 'ProdukController@somePage');
+
 
 
 

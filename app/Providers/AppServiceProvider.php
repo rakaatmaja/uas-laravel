@@ -3,7 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\View;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -21,8 +22,13 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
+   // AppServiceProvider.php atau ServiceProvider lainnya
     public function boot()
     {
-        //
+        $cart = Session::get('cart', []);
+        $cartCount = count($cart);
+        View::share('cartItems', $cart);
+        View::share('cartCount', $cartCount);
     }
+
 }

@@ -3,10 +3,10 @@
         {{-- NAVBAR --}}  
     <script src="{{asset('js/cart.js')}}" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js" defer></script>
 
 
-    <div x-data="{ cartOpen: false, cartItems: {{ count($cartItems ?? []) }} }" class="bg-white">
+
+    <div id="cartApp" class="bg-white">
     <div class="container mx-auto px-6 py-5">
         <div class="flex items-center justify-between">
         <div class="hidden w-full text-gray-600 md:flex md:items-center">
@@ -15,6 +15,8 @@
             </svg>
             <span class="mx-1 text-sm">ID</span>
         </div>
+
+        {{-- LOGIN REGISTER --}}
         <div class="flex md:justify-center justify-start w-full">
             <img src="{{ asset('images/logo1.png') }}" alt="Deskripsi Gambar" class="md:w-24 w-16 h-auto">
             @if (Route::has('login'))
@@ -34,31 +36,32 @@
         </div>
 
         {{-- CART --}}
-        <div class="container">
+    <div class="container">
         <div class="cartOpen flex items-center justify-end w-full">
-          <button @click="cartOpen = !cartOpen" class="text-gray-600 focus:outline-none mx-4 sm:mx-0">
-    <div class="relative">
-        <span id="cartBadge" class="absolute top-0 right-0 inline-block bg-red-500 text-white rounded-full px-2 py-1 text-xs" x-show="Object.keys(cartItems).length > 0">{{ count($cartItems ?? []) }}</span>
-        <svg xmlns="http://www.w3.org/2000/svg" class="shrink-0 mr-3 h-9 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-        </svg>
-    </div>
-</button>
+            <button onclick="toggleCart()" class="text-gray-600 focus:outline-none mx-4 sm:mx-0">
+                <div class="relative">
+                    <span id="cartBadge" class="absolute top-0 right-0 inline-block bg-red-500 text-white rounded-full px-2 py-1 text-xs">{{ $cartCount }}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="shrink-0 mr-3 h-9 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                </div>
+            </button>
+            
 
-            
-            
         {{-- CART OPEN --}}
         <div class="flex sm:hidden">
-            <button @click="isOpen = !isOpen" type="button" class="text-gray-600 hover:text-gray-500 focus:outline-none focus:text-gray-500" aria-label="toggle menu">
+            <button  onclick="toggleCart()" type="button" class="text-gray-600 hover:text-gray-500 focus:outline-none focus:text-gray-500" aria-label="toggle menu">
                 <svg viewBox="0 0 24 24" class="h-6 w-6 fill-current">
                     <path fill-rule="evenodd" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"></path>
                 </svg>
             </button>
         </div>
     </div>
-        </div>
+</div>
 
         </div>
+
+        {{-- NAVBAR --}}
         <nav :class="isOpen ? '' : 'hidden'" class="sm:flex sm:justify-center sm:items-center mt-3">
         <div class="flex flex-col sm:flex-row">
             <x-nav-link :href="route('home')" :active="request()->routeIs('home')" class="mt-3 text-gray-600 sm:mx-3 sm:mt-0">{{ __('Home') }}</x-nav-link>
@@ -75,55 +78,17 @@
         <input class="w-full border rounded-md pl-10 pr-4 py-2 focus:border-blue-500 focus:outline-none focus:shadow-outline" type="text" placeholder="Search">
         </div>
     </div>
-    <div :class="cartOpen ? 'translate-x-0 ease-out' : 'translate-x-full ease-in'" class="fixed right-0 top-0 max-w-xs w-full h-full px-6 py-4 transition duration-300 transform overflow-y-auto bg-white border-l-2 border-gray-300">
+
+    <div id="cartContainer" class="fixed right-0 top-0 max-w-xs w-full h-full px-6 py-4 transition duration-300 transform overflow-y-auto bg-white border-l-2 border-gray-300" style="transform: translateX(100%)">
         <div class="flex items-center justify-between">
         <h3 class="text-2xl font-medium text-gray-700">Your cart</h3>
-        <button @click="cartOpen = !cartOpen" class="text-gray-600 focus:outline-none">
+        <button  onclick="toggleCart()" class="text-gray-600 focus:outline-none">
             <svg class="h-5 w-5" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor"><path d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
         </div>
         <hr class="my-3">
-        <div class="flex justify-between mt-6">
-        {{-- <div class="flex">
-            <img class="h-20 w-20 object-cover rounded" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGkT1IX53PwPSq8iaf7tlmjcOX0a5HpqNFNw&usqp=CAU" alt=""> --}}
-
-            {{-- LIST PRODUK --}}
-            {{-- <div class="mx-3">
-            <h3 class="text-sm text-gray-600">Jus Buah</h3>
-            <div class="flex items-center mt-2">
-                <button class="text-gray-500 focus:outline-none focus:text-gray-600">
-                <button class="text-gray-500 focus:outline-none focus:text-gray-600">
-                <svg class="h-5 w-5" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </button>
-                <span class="text-gray-700 mx-2">2</span>
-                <button class="text-gray-500 focus:outline-none focus:text-gray-600">
-                <svg class="h-5 w-5" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </button>
-            </div>
-            </div>
+        <div id="cartContainerr" class=" justify-between items-center mt-6">
         </div>
-        <span class="text-gray-600">20$</span> --}}
-
-            {{-- GET LIST PRODUK --}}
-            @if(isset($cartItems) && is_array($cartItems))
-            @foreach($cartItems as $productId => $item)
-                <div class="flex justify-between mt-6">
-                    <div class="flex">
-                        <img class="h-20 w-20 object-cover rounded" src="{{ $item['gambar_produk'] }}" alt="">
-                        <div class="mx-3">
-                            <h3 class="text-sm text-gray-600">{{ $item['nama_produk'] }}</h3>
-                            <div class="flex items-center mt-2">
-                                <span class="text-gray-700 mx-2">{{ $item['stok_produk'] }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <span class="text-gray-600">{{ $item['harga_produk'] }}</span>
-                </div>
-            @endforeach
-        @endif
-        
-        </div>
-
         <div class="mt-8">
         <form class="flex items-center justify-center">
             <input class="form-input w-48" type="text" placeholder="Add promocode">
@@ -187,61 +152,154 @@
                         @foreach ($produk as $key=>$td)
                         <div class="w-full max-w-sm mx-auto rounded-md shadow-md overflow-hidden">
                             <div class="flex items-end justify-end h-56 w-full bg-cover" style="background-image: url('{{ $td->gambar_produk}}')">
-
-
-                                <button id="addToCartButton" data-id="{{ $td->id_produk }}" class="p-2 rounded-full bg-blue-600 text-white mx-5 -mb-4 hover:bg-blue-500 focus:outline-none focus:bg-blue-500 addToCartButton">
-
-                                    
+                                <button data-id="{{ $td->id_produk }}" class="p-2 rounded-full bg-blue-600 text-white mx-5 -mb-4 hover:bg-blue-500 focus:outline-none focus:bg-blue-500 addToCartButton">
                                     <svg class="h-5 w-5 mx-2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
                                         <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
                                     </svg>
                                 </button>
-                                
                             </div>
                             <div class="px-5 py-3">
                                 <h3 class="text-gray-700 uppercase">{{$td->nama_produk }}</h3>
                                 <span class="text-gray-500 mt-2">Rp.{{$td->harga_produk}}</span>
                             </div>
                         </div>
-                        @endforeach
+                    @endforeach
+                    
                     
                     </div>
                 </div>
             </div>
         </main>
 
-        <script>
+         <script>
+            function toggleCart() {  
+            cartContainer.style.transform = cartContainer.style.transform === 'translateX(100%)' ? 'translateX(0)' : 'translateX(100%)';
+        }
         document.addEventListener('DOMContentLoaded', function () {
-        const addToCartButtons = document.querySelectorAll('.addToCartButton');
-        const cartBadge = document.getElementById('cartBadge');
+            const addToCartButtons = document.querySelectorAll('.addToCartButton');
+            const cartBadge = document.getElementById('cartBadge');
 
-        addToCartButtons.forEach(button => {
-            button.addEventListener('click', function (event) {
-                event.preventDefault();
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', function (event) {
+                    event.preventDefault();
 
-                const productId = button.dataset.id;
+                    const productId = button.dataset.id;
 
-                // Ganti URL API sesuai dengan kebutuhan Anda
-                axios.post(`/api/addtocart/${productId}`, { stok_produk: 1 })
+                    axios.post(`/api/addtocart/${productId}`, { stok_produk: 1 })
+                        .then(response => {
+                            alert(response.data.message);
+                            console.log(response.data);
+                            location.reload();
+                            if (response.data.cart !== undefined) {
+                                const cartItemCount = Object.keys(response.data.cart).length;
+                                document.getElementById('cartBadge').innerText = cartItemCount;
+                            } else {
+                                console.error('Cart data not found in the response:', response.data);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error adding to cart:', error);
+                        });
+                });
+            });
+        });
+
+        fetch('/api/getCartCount')
+            .then(response => response.json())
+            .then(data => {
+                const cartItemCount = data.cartCount;
+                document.getElementById('cartBadge').innerText = cartItemCount;
+            })
+            .catch(error => console.error('Error getting cart count:', error));
+
+            fetch('api/cart')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                
+                console.log('Cart response:', data.cart);
+                
+                // Clear existing content in cartContainer
+                cartContainerr.innerHTML = '';
+                
+                if (Object.keys(data.cart).length > 0) {
+                    // Iterate over cart items and append HTML to cartContainer
+                    Object.values(data.cart).forEach(item => {
+                        const productHtml = `
+                            <div class="flex justify-between items-center mt-6">
+                                <div class="flex">
+                                    <img class="h-20 w-20 object-cover rounded" src="${item.gambar_produk}" alt="">
+                                    <div class="mx-3">
+                                        <h3 class="text-sm text-gray-600">${item.nama_produk}</h3>
+                                        <div class="flex items-center mt-2">
+                                            <button class="text-gray-500 focus:outline-none focus:text-gray-600" onclick="updateCartItem('${item.id}', 1)">
+                            <svg class="h-5 w-5" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                                <path d="M12 9v3m0 0v3m0-3h3m-3 0H9"></path>
+                            </svg>
+                        </button>
+                        <span id="stok_produk_${item.id}" class="text-gray-700 mx-2">${item.stok_produk}</span>
+                        <button class="text-gray-500 focus:outline-none focus:text-gray-600" onclick="updateCartItem('${item.id}', -1)">
+                            <svg class="h-5 w-5" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                                <path d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="text-gray-600">Rp.${item.harga_produk}</span>
+                            </div>
+                        `;
+                        // Append the productHtml to cartContainer
+                        cartContainerr.innerHTML += productHtml;
+                    });
+                } else {
+                    // Handle case where cart is empty
+                    cartContainerr.innerHTML = '<p>No items in the cart</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching cart details:', error);
+            });
+
+
+      
+        // Tambahkan fungsi JavaScript untuk mengupdate jumlah item
+        function updateCartItem(itemId, amount) {
+            // Ambil elemen stok_produk yang sesuai
+            const stokElement = document.getElementById(`stok_produk_${itemId}`);
+            
+            // Hitung stok_produk yang baru
+            const newStok = parseInt(stokElement.innerText) + amount;
+
+            // Pastikan stok_produk tidak kurang dari 0
+            const updatedStok = Math.max(newStok, 0);
+
+            // Update stok_produk
+            stokElement.innerText = updatedStok;
+
+        }
+
+        function removeFromCart(productId) {
+    axios.delete(`/api/removefromcart/${productId}`)
         .then(response => {
             alert(response.data.message);
             console.log(response.data);
 
-            // Perbarui jumlah item di keranjang
-            cartItems = response.data.cartItemCount;
+            // Refresh halaman atau lakukan pembaruan UI sesuai kebutuhan
+            location.reload();
         })
         .catch(error => {
-            console.error('Error adding to cart:', error);
+            console.error('Error removing from cart:', error);
         });
-
-            });
-        });
-    });
-        </script>
-        
-        
-
+}
+    </script>
             
+         
+
         <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
         
     </x-landing-layout>                     

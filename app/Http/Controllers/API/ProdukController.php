@@ -18,13 +18,15 @@ class ProdukController extends Controller
         return response()->json($produk, 200);
     }
 
-    public function kategori(){
+    public function kategori()
+    {
         $kategori = Kategori::all();
         return response()->json($kategori, 200);
     }
 
     public function addToCartApi(Request $request, $id)
     {
+        // Session::start();
         $produk = Produk::findOrFail($id);
 
         // Mendapatkan keranjang dari sesi
@@ -34,43 +36,71 @@ class ProdukController extends Controller
         if (isset($cart[$id])) {
             $cart[$id]['stok_produk'] += $request->input('stok_produk', 1);
         } else {
-            // Jika produk belum ada di dalam keranjang, tambahkan ke keranjang
-            $cart[$id] = [
-                "nama_produk" => $produk->nama_produk,
-                "desk_produk" => $produk->desk_produk,
-                "harga_produk" => $produk->harga_produk,
-                "gambar_produk" => $produk->gambar_produk,
-                "stok_produk" => $request->input('stok_produk', 1),
-            ];
+            $cart[$id] = $produk->toArray();
+            $cart[$id]['stok_produk'] = $request->input('stok_produk', 1);
         }
 
+        // Update cartCount in the session
+        $cartCount = count($cart);
+        Session::put('cartCount', $cartCount);
         // Menyimpan keranjang kembali ke sesi
         Session::put('cart', $cart);
+        $newCartItem = $cart[$id];
 
-        return response()->json(['cart' => $cart, 'message' => 'Product added to cart successfully'], 200);
+        return response()->json(['newCartItem' => $newCartItem, 'cart' => $cart, 'cartCount' => $cartCount, 'message' => 'Product added to cart successfully'], 200);
     }
-    
+
+     public function removeFromCartApi($id)
+    {
+        // Mendapatkan keranjang dari sesi
+        $cart = Session::get('cart', []);
+
+        // Periksa apakah produk dengan ID tertentu ada di dalam keranjang
+        if (isset($cart[$id])) {
+            // Hapus produk dari keranjang
+            unset($cart[$id]);
+
+            // Update cartCount in the session
+            $cartCount = count($cart);
+            Session::put('cartCount', $cartCount);
+
+            // Simpan keranjang kembali ke sesi
+            Session::put('cart', $cart);
+
+            return response()->json(['cart' => $cart, 'cartCount' => $cartCount, 'message' => 'Product removed from cart successfully'], 200);
+        } else {
+            // Produk tidak ditemukan di keranjang
+            return response()->json(['message' => 'Product not found in cart'], 404);
+        }
+    }
+
+
     public function somePage()
-{
-    // ... logic lainnya
-
-    // Panggil fungsi showCartView() dan sertakan $cartItems ke dalam view
-    return $this->showCartView();
-}
+    {
+        // Panggil fungsi showCartView() dan sertakan $cartItems ke dalam view
+        return $this->showCartView();
+    }
 
 
-public function showCart()
-{
-    // Mendapatkan keranjang dari sesi, atau array kosong jika belum ada
-    $cartItems = Session::get('cart', []);
+    public function showCart()
+    {
+        // Retrieve the cart items from the session, or an empty array if not set
+        $cart = Session::get('cart', []);
+        // Retrieve the cart count from the session, or 0 if not set
+        $cartCount = Session::get('cartCount', 0);
+        // Pass both cart items and cart count to the view
+        // return view('frontpage.landingpage', ['cartItems' => $cartItems, 'cartCount' => $cartCount]);
+        return response()->json(['cart' => $cart, 'cartCount' => $cartCount]);
+    }
 
-    // ... (kode lanjutan untuk menampilkan keranjang)
+    public function getCartCount()
+    {
+        // Mendapatkan jumlah item di keranjang dari sesi
+        $cartCount = Session::get('cartCount', 0);
+        return response()->json(['cartCount' => $cartCount]);
+    }
 
-    // Kemudian, kirim variabel $cartItems ke view
-    return view('frontpage.landingpage', ['cartItems' => $cartItems]);
-}
-
-
+    
 
 
     public function create()
